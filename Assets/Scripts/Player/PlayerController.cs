@@ -15,21 +15,38 @@ public class PlayerController : MonoBehaviour
 {
     public Animator playerAnim;
 
-    public Transform moveDummy;
+    private Transform moveDummy;
+    private Transform player;
 
     private AnimatorStateInfo characterAnimInfo;
 
+    private const float moveSpeed = 5f;
+
+    void Start()
+    {
+        moveDummy = GameObject.Find("MoveDummy").transform;
+        player = GameObject.Find("Boar").transform;
+    }
+
     void Update()
     {
+        player.position = Vector3.MoveTowards(transform.position, moveDummy.position, moveSpeed * Time.deltaTime);
+
         playerAnim.SetInteger("Moving", 0);
 
         if (SwipeManager.Instance.isSwiping(SwipeDirection.Left))
         {
-            AnimatorControll(PlayerAnimation.Left);
+            if (player.position.x > -2.0f)
+            {
+                AnimatorControll(PlayerAnimation.Left);
+            }
         }
         else if (SwipeManager.Instance.isSwiping(SwipeDirection.Right))
         {
-            AnimatorControll(PlayerAnimation.Right);
+            if (player.position.x < 2.0f)
+            {
+                AnimatorControll(PlayerAnimation.Right);
+            }
         }
         else if (SwipeManager.Instance.isSwiping(SwipeDirection.Up))
         {
@@ -39,7 +56,6 @@ public class PlayerController : MonoBehaviour
         {
             AnimatorControll(PlayerAnimation.Slide);
         }
-
     }
 
     private void AnimatorControll(PlayerAnimation animation)
@@ -85,6 +101,5 @@ public class PlayerController : MonoBehaviour
         {
             moveDummy.Translate(Vector3.left);
         }
-
     }
 }
