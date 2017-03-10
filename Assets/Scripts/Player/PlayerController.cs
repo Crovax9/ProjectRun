@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour
 
     private AnimatorStateInfo characterAnimInfo;
 
-    private const float moveSpeed = 5f;
+    private const float moveSpeed = 6f;
 
     void Start()
     {
@@ -28,10 +28,13 @@ public class PlayerController : MonoBehaviour
         player = GameObject.Find("Boar").transform;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         player.position = Vector3.MoveTowards(transform.position, moveDummy.position, moveSpeed * Time.deltaTime);
+    }
 
+    void Update()
+    {
         playerAnim.SetInteger("Moving", 0);
 
         if (SwipeManager.Instance.isSwiping(SwipeDirection.Left))
@@ -88,7 +91,6 @@ public class PlayerController : MonoBehaviour
                     break;
             }
         }
-
     }
 
     private void DummyMove(PlayerAnimation direction)
