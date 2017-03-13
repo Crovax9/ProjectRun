@@ -16,8 +16,6 @@ public class MapManager : MonoBehaviour
     {
         get
         {
-            if (_instance == null)
-                _instance = new MapManager();
             return _instance;
         }
     }
@@ -27,6 +25,11 @@ public class MapManager : MonoBehaviour
     public GameObject parent;
 
     private static List<GameObject> poolLevel1 = new List<GameObject>();
+
+    void Awake()
+    {
+        _instance = this;
+    }
 
     void Start()
     {
@@ -52,5 +55,23 @@ public class MapManager : MonoBehaviour
         poolLevel1[index].transform.position = setPosition;
         poolLevel1[index].SetActive(true);
         setPosition.z += DISTANCE_MAPS_Z;
+    }
+
+    public void ObstaclesJudgement(GameObject obstacles)
+    {
+        switch (obstacles.name)
+        {
+            case "Stone":
+                obstacles.GetComponent<MeshSplit>().enabled = true;
+                break;
+
+            case "Stump":
+                obstacles.GetComponent<MeshSplit>().enabled = true;
+                break;
+
+            default:
+
+                break;
+        }
     }
 }

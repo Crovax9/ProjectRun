@@ -9,6 +9,8 @@ public enum PlayerAnimation
     Left = 3,
     Jump = 4,
     Slide = 5,
+    Hit = 6,
+    Death = 7,
 }
 
 public class PlayerController : MonoBehaviour
@@ -21,6 +23,7 @@ public class PlayerController : MonoBehaviour
     private AnimatorStateInfo characterAnimInfo;
 
     private const float moveSpeed = 6f;
+    private bool deathFlag = false;
 
     void Start()
     {
@@ -30,13 +33,16 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        player.position = Vector3.MoveTowards(transform.position, moveDummy.position, moveSpeed * Time.deltaTime);
+        if (!deathFlag)
+        {
+            playerAnim.SetInteger("Moving", 0);
+            player.position = Vector3.MoveTowards(transform.position, moveDummy.position, moveSpeed * Time.deltaTime);
+        }
     }
 
     void Update()
     {
-        playerAnim.SetInteger("Moving", 0);
-
+        
         if (SwipeManager.Instance.isSwiping(SwipeDirection.Left))
         {
             if (player.position.x > -2.0f)
@@ -59,10 +65,12 @@ public class PlayerController : MonoBehaviour
         {
             AnimatorControll(PlayerAnimation.Slide);
         }
+
     }
 
     private void AnimatorControll(PlayerAnimation animation)
     {
+        
         characterAnimInfo = playerAnim.GetCurrentAnimatorStateInfo(0);
         if (characterAnimInfo.IsName("Running"))
         {
@@ -86,11 +94,29 @@ public class PlayerController : MonoBehaviour
                     playerAnim.SetInteger("Moving", 4);
                     break;
 
+                case PlayerAnimation.Hit:
+                    playerAnim.SetInteger("Moving", 10);
+                    Debug.Log("call2");
+                    break;
+
+
                 default:
 
                     break;
             }
+
+
         }
+
+        /*if (animation == PlayerAnimation.Hit)
+        {
+            
+            Debug.Log("call2");
+        }
+        else if (animation == PlayerAnimation.Death)
+        {
+            playerAnim.SetInteger("Moving", 11);
+        }*/
     }
 
     private void DummyMove(PlayerAnimation direction)
@@ -102,6 +128,29 @@ public class PlayerController : MonoBehaviour
         else if (direction == PlayerAnimation.Left)
         {
             moveDummy.Translate(Vector3.left);
+        }
+    }
+
+    void OnTriggerEnter(Collider col)
+    {
+        if (col.CompareTag("Maps"))
+        {
+            col.gameObject.SetActive(false);
+            MapManager.Instance.SetMaps();
+        }
+        else if (col.CompareTag("Obstacles"))
+        {
+            characterAnimInfo = playerAnim.GetCurrentAnimatorStateInfo(0);
+            if (!characterAnimInfo.IsName("Jump"))
+            {
+                MapManager.Instance.ObstaclesJudgement(col.gameObject);
+                AnimatorControll(PlayerAnimation.Hit);
+                Debug.Log("call");
+            }
+
+            //Obstacles Judgement
+            //Player Animation Method
+            //Obstacles Destroy Method
         }
     }
 }
