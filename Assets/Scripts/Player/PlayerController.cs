@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public enum PlayerAnimation
 {
@@ -16,11 +17,13 @@ public enum PlayerAnimation
 public class PlayerController : MonoBehaviour
 {
     public Animator playerAnim;
+    public List<SkinnedMeshRenderer> renderer;
 
     private Transform moveDummy;
     private Transform player;
 
     private AnimatorStateInfo characterAnimInfo;
+    
 
     private const float moveSpeed = 6f;
     private bool deathFlag = false;
@@ -42,7 +45,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        
+        characterAnimInfo = playerAnim.GetCurrentAnimatorStateInfo(0);
         if (SwipeManager.Instance.isSwiping(SwipeDirection.Left))
         {
             if (player.position.x > -2.0f)
@@ -65,13 +68,10 @@ public class PlayerController : MonoBehaviour
         {
             AnimatorControll(PlayerAnimation.Slide);
         }
-
     }
 
     private void AnimatorControll(PlayerAnimation animation)
     {
-        
-        characterAnimInfo = playerAnim.GetCurrentAnimatorStateInfo(0);
         if (characterAnimInfo.IsName("Running"))
         {
             switch (animation)
@@ -94,29 +94,20 @@ public class PlayerController : MonoBehaviour
                     playerAnim.SetInteger("Moving", 4);
                     break;
 
-                case PlayerAnimation.Hit:
-                    playerAnim.SetInteger("Moving", 10);
-                    Debug.Log("call2");
-                    break;
-
-
                 default:
 
                     break;
             }
-
-
         }
-
-        /*if (animation == PlayerAnimation.Hit)
+        if (animation == PlayerAnimation.Hit)
         {
-            
+            playerAnim.SetInteger("Moving", 10);
             Debug.Log("call2");
         }
         else if (animation == PlayerAnimation.Death)
         {
             playerAnim.SetInteger("Moving", 11);
-        }*/
+        }
     }
 
     private void DummyMove(PlayerAnimation direction)
@@ -131,26 +122,68 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+
+    IEnumerator NoDamage(float waitTime)
+    {
+        renderer.ForEach(render => render.enabled = false);
+        yield return new WaitForSeconds(0.2f);
+        renderer.ForEach(render => render.enabled = true);
+        yield return new WaitForSeconds(0.2f);
+
+    }
+
+
     void OnTriggerEnter(Collider col)
     {
         if (col.CompareTag("Maps"))
         {
             col.gameObject.SetActive(false);
-            MapManager.Instance.SetMaps();
+            MapManager.Instance.Level1MapSetting();
         }
         else if (col.CompareTag("Obstacles"))
         {
-            characterAnimInfo = playerAnim.GetCurrentAnimatorStateInfo(0);
-            if (!characterAnimInfo.IsName("Jump"))
+            Debug.Log("call3");
+            if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo))
             {
-                MapManager.Instance.ObstaclesJudgement(col.gameObject);
                 AnimatorControll(PlayerAnimation.Hit);
+                StartCoroutine(NoDamage(2.0f));
                 Debug.Log("call");
             }
-
             //Obstacles Judgement
             //Player Animation Method
             //Obstacles Destroy Method
         }
     }
+    void OnTriggerStay(Collider col)
+    {
+        if (col.CompareTag("Obstacles"))
+        {
+            Debug.Log("call3");
+            if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo))
+            {
+                AnimatorControll(PlayerAnimation.Hit);
+                Debug.Log("call");
+            }
+            //Obstacles Judgement
+            //Player Animation Method
+            //Obstacles Destroy Method
+        }
+    }
+    void OnTriggerExit(Collider col)
+    {
+        if (col.CompareTag("Obstacles"))
+        {
+            Debug.Log("call3");
+            if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo))
+            {
+                AnimatorControll(PlayerAnimation.Hit);
+                Debug.Log("call");
+            }
+            //Obstacles Judgement
+            //Player Animation Method
+            //Obstacles Destroy Method
+        }
+    }
+
+
 }

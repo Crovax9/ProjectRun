@@ -33,10 +33,10 @@ public class MapManager : MonoBehaviour
 
     void Start()
     {
-        MapsSet();
+        MapInit();
     }
 
-    public void MapsSet()
+    public void MapInit()
     {
         mapsLevel1.ForEach((c, index) => poolLevel1.Add((GameObject)Instantiate(c, Vector3.zero, Quaternion.identity)));
         poolLevel1.ForEach((c, index) => c.transform.SetParent(parent.transform));
@@ -44,12 +44,12 @@ public class MapManager : MonoBehaviour
         poolLevel1.ForEach(c => c.SetActive(false));
     }
 
-    public void SetMaps()
+    public void Level1MapSetting()
     {
-        int index = Random.Range(0, 10);
+        int index = Random.Range(0, poolLevel1.Count);
         if (poolLevel1[index].activeInHierarchy)
         {
-            SetMaps();
+            Level1MapSetting();
             return;
         }
         poolLevel1[index].transform.position = setPosition;
@@ -57,21 +57,26 @@ public class MapManager : MonoBehaviour
         setPosition.z += DISTANCE_MAPS_Z;
     }
 
-    public void ObstaclesJudgement(GameObject obstacles)
+    public bool ObstaclesCollisionCheck(GameObject obstacles, AnimatorStateInfo animState)
     {
-        switch (obstacles.name)
+        if (!animState.IsName("Jump"))
         {
-            case "Stone":
-                obstacles.GetComponent<MeshSplit>().enabled = true;
-                break;
+            switch (obstacles.name)
+            {
+                case "Stone":
 
-            case "Stump":
-                obstacles.GetComponent<MeshSplit>().enabled = true;
-                break;
+                    obstacles.GetComponent<MeshSplit>().enabled = true;
+                    return true;
 
-            default:
+                case "Stump":
+                    obstacles.GetComponent<MeshSplit>().enabled = true;
+                    return true;
 
-                break;
+                default:
+
+                    break;
+            }
         }
+        return false;
     }
 }
