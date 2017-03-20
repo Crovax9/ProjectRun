@@ -11,13 +11,19 @@ public enum PlayerAnimation
     Jump = 4,
     Slide = 5,
     Hit = 6,
-    Death = 7,
+    Slip = 7,
+    Death = 8,
+
+
+
+    None = 20,
+
 }
 
 public class PlayerController : MonoBehaviour
 {
     public Animator playerAnim;
-    public List<SkinnedMeshRenderer> renderer;
+    public List<SkinnedMeshRenderer> meshRenderer;
 
     private Transform moveDummy;
     private Transform player;
@@ -25,8 +31,10 @@ public class PlayerController : MonoBehaviour
     private AnimatorStateInfo characterAnimInfo;
     
 
-    private const float moveSpeed = 6f;
+    private const float moveSpeed = 7.0f;
     private bool deathFlag = false;
+    private bool noDamage = false;
+    private float dummyMoveSpeed = 5.0f;
 
     void Start()
     {
@@ -38,6 +46,7 @@ public class PlayerController : MonoBehaviour
     {
         if (!deathFlag)
         {
+            moveDummy.Translate(0, 0, dummyMoveSpeed * Time.deltaTime);
             playerAnim.SetInteger("Moving", 0);
             player.position = Vector3.MoveTowards(transform.position, moveDummy.position, moveSpeed * Time.deltaTime);
         }
@@ -104,10 +113,20 @@ public class PlayerController : MonoBehaviour
             playerAnim.SetInteger("Moving", 10);
             Debug.Log("call2");
         }
-        else if (animation == PlayerAnimation.Death)
+        else if (animation == PlayerAnimation.Slip)
         {
             playerAnim.SetInteger("Moving", 11);
+            Debug.Log("call3");
         }
+        else if (animation == PlayerAnimation.Death)
+        {
+            playerAnim.SetInteger("Moving", 12);
+        }
+    }
+
+    private float PlayerDistance()
+    {
+        return player.position.z;
     }
 
     private void DummyMove(PlayerAnimation direction)
@@ -125,11 +144,16 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator NoDamage(float waitTime)
     {
-        renderer.ForEach(render => render.enabled = false);
-        yield return new WaitForSeconds(0.2f);
-        renderer.ForEach(render => render.enabled = true);
-        yield return new WaitForSeconds(0.2f);
-
+        noDamage = true;
+        var endTime = Time.time + waitTime;
+        while (Time.time < endTime)
+        {
+            meshRenderer.ForEach(render => render.enabled = false);
+            yield return new WaitForSeconds(0.1f);
+            meshRenderer.ForEach(render => render.enabled = true);
+            yield return new WaitForSeconds(0.1f);
+        }
+        noDamage = false;
     }
 
 
@@ -138,50 +162,79 @@ public class PlayerController : MonoBehaviour
         if (col.CompareTag("Maps"))
         {
             col.gameObject.SetActive(false);
-            MapManager.Instance.Level1MapSetting();
+            MapManager.Instance.MapSpawn(PlayerDistance());
         }
-        else if (col.CompareTag("Obstacles"))
+        if (!noDamage && !deathFlag)
         {
-            Debug.Log("call3");
-            if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo))
+            if (col.CompareTag("Obstacles"))
             {
-                AnimatorControll(PlayerAnimation.Hit);
-                StartCoroutine(NoDamage(2.0f));
-                Debug.Log("call");
+                if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo) == PlayerAnimation.Hit.ToString())
+                {
+                    AnimatorControll(PlayerAnimation.Hit);
+                    StartCoroutine(NoDamage(3.0f));
+                    Debug.Log("call");
+                }
+                else if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo) == PlayerAnimation.Slide.ToString())
+                {
+                    AnimatorControll(PlayerAnimation.Slide);
+                }
+                else if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo) == PlayerAnimation.Death.ToString())
+                {
+                    AnimatorControll(PlayerAnimation.Death);
+                    col.GetComponent<Animation>().Play("Take 001");
+                    deathFlag = true;
+                }
             }
-            //Obstacles Judgement
-            //Player Animation Method
-            //Obstacles Destroy Method
         }
     }
     void OnTriggerStay(Collider col)
     {
-        if (col.CompareTag("Obstacles"))
+        if (!noDamage && !deathFlag)
         {
-            Debug.Log("call3");
-            if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo))
+            if (col.CompareTag("Obstacles"))
             {
-                AnimatorControll(PlayerAnimation.Hit);
-                Debug.Log("call");
+                if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo) == PlayerAnimation.Hit.ToString())
+                {
+                    AnimatorControll(PlayerAnimation.Hit);
+                    StartCoroutine(NoDamage(3.0f));
+                    Debug.Log("call");
+                }
+                else if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo) == PlayerAnimation.Slide.ToString())
+                {
+                    AnimatorControll(PlayerAnimation.Slide);
+                }
+                else if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo) == PlayerAnimation.Death.ToString())
+                {
+                    AnimatorControll(PlayerAnimation.Death);
+                    col.GetComponent<Animation>().Play("Take 001");
+                    deathFlag = true;
+                }
             }
-            //Obstacles Judgement
-            //Player Animation Method
-            //Obstacles Destroy Method
         }
     }
     void OnTriggerExit(Collider col)
     {
-        if (col.CompareTag("Obstacles"))
+        if (!noDamage && !deathFlag)
         {
-            Debug.Log("call3");
-            if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo))
+            if (col.CompareTag("Obstacles"))
             {
-                AnimatorControll(PlayerAnimation.Hit);
-                Debug.Log("call");
+                if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo) == PlayerAnimation.Hit.ToString())
+                {
+                    AnimatorControll(PlayerAnimation.Hit);
+                    StartCoroutine(NoDamage(3.0f));
+                    Debug.Log("call");
+                }
+                else if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo) == PlayerAnimation.Slide.ToString())
+                {
+                    AnimatorControll(PlayerAnimation.Slide);
+                }
+                else if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo) == PlayerAnimation.Death.ToString())
+                {
+                    AnimatorControll(PlayerAnimation.Death);
+                    col.GetComponent<Animation>().Play("Take 001");
+                    deathFlag = true;
+                }
             }
-            //Obstacles Judgement
-            //Player Animation Method
-            //Obstacles Destroy Method
         }
     }
 
