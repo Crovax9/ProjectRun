@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour
 {
     public Animator playerAnim;
     public List<SkinnedMeshRenderer> meshRenderer;
+    public CapsuleCollider playerCollider;
 
     private Transform moveDummy;
     private Transform player;
@@ -73,10 +74,6 @@ public class PlayerController : MonoBehaviour
         {
             AnimatorControll(PlayerAnimation.Jump);
         }
-        else if (SwipeManager.Instance.isSwiping(SwipeDirection.Down))
-        {
-            AnimatorControll(PlayerAnimation.Slide);
-        }
     }
 
     private void AnimatorControll(PlayerAnimation animation)
@@ -97,10 +94,7 @@ public class PlayerController : MonoBehaviour
 
                 case PlayerAnimation.Jump:
                     playerAnim.SetInteger("Moving", 3);
-                    break;
-
-                case PlayerAnimation.Slide:
-                    playerAnim.SetInteger("Moving", 4);
+                    StartCoroutine(JumpCollider());
                     break;
 
                 default:
@@ -111,12 +105,10 @@ public class PlayerController : MonoBehaviour
         if (animation == PlayerAnimation.Hit)
         {
             playerAnim.SetInteger("Moving", 10);
-            Debug.Log("call2");
         }
-        else if (animation == PlayerAnimation.Slip)
+        else if (animation == PlayerAnimation.Slide)
         {
-            playerAnim.SetInteger("Moving", 11);
-            Debug.Log("call3");
+            playerAnim.SetInteger("Moving", 4);
         }
         else if (animation == PlayerAnimation.Death)
         {
@@ -141,6 +133,54 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void CollisionCheckMethod(Collider col)
+    {
+        if (!noDamage && !deathFlag)
+        {
+            if (characterAnimInfo.IsTag("All"))
+            {
+                switch (col.name)
+                {
+                    case "Banana":
+                        AnimatorControll(PlayerAnimation.Slide);
+                        Debug.Log("Slide");
+                        break;
+
+                    case "Trap":
+                        AnimatorControll(PlayerAnimation.Death);
+                        col.GetComponent<Animation>().Play("Take 001");
+                        deathFlag = true;
+                        Debug.Log("Death");
+                        break;
+
+                    default:
+                        col.GetComponent<MeshSplit>().enabled = true;
+                        AnimatorControll(PlayerAnimation.Hit);
+                        StartCoroutine(NoDamage(3.0f));
+                        Debug.Log("Hit");
+                        break;
+                }
+
+            }
+            else if (characterAnimInfo.IsTag("Jump"))
+            {
+                if (col.name == "Rock")
+                {
+                    col.GetComponent<MeshSplit>().enabled = true;
+                    AnimatorControll(PlayerAnimation.Hit);
+                    StartCoroutine(NoDamage(3.0f));
+                    Debug.Log("Hit");
+                }
+                else if (col.name == "Root")
+                {
+                    col.GetComponent<MeshSplit>().enabled = true;
+                    AnimatorControll(PlayerAnimation.Hit);
+                    StartCoroutine(NoDamage(3.0f));
+                    Debug.Log("Hit");
+                }
+            }
+        }
+    }
 
     IEnumerator NoDamage(float waitTime)
     {
@@ -156,6 +196,13 @@ public class PlayerController : MonoBehaviour
         noDamage = false;
     }
 
+    IEnumerator JumpCollider()
+    {
+        playerCollider.center = new Vector3(0.0f, 1.5f, 0.5f);
+        yield return new WaitForSeconds(1.0f);
+        playerCollider.center = new Vector3(0.0f, 0.5f, 0.5f);
+    }
+
 
     void OnTriggerEnter(Collider col)
     {
@@ -164,77 +211,23 @@ public class PlayerController : MonoBehaviour
             col.gameObject.SetActive(false);
             MapManager.Instance.MapSpawn(PlayerDistance());
         }
-        if (!noDamage && !deathFlag)
+        if (col.CompareTag("Obstacles"))
         {
-            if (col.CompareTag("Obstacles"))
-            {
-                if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo) == PlayerAnimation.Hit.ToString())
-                {
-                    AnimatorControll(PlayerAnimation.Hit);
-                    StartCoroutine(NoDamage(3.0f));
-                    Debug.Log("call");
-                }
-                else if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo) == PlayerAnimation.Slide.ToString())
-                {
-                    AnimatorControll(PlayerAnimation.Slide);
-                }
-                else if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo) == PlayerAnimation.Death.ToString())
-                {
-                    AnimatorControll(PlayerAnimation.Death);
-                    col.GetComponent<Animation>().Play("Take 001");
-                    deathFlag = true;
-                }
-            }
+            CollisionCheckMethod(col);
         }
     }
     void OnTriggerStay(Collider col)
     {
-        if (!noDamage && !deathFlag)
+        if (col.CompareTag("Obstacles"))
         {
-            if (col.CompareTag("Obstacles"))
-            {
-                if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo) == PlayerAnimation.Hit.ToString())
-                {
-                    AnimatorControll(PlayerAnimation.Hit);
-                    StartCoroutine(NoDamage(3.0f));
-                    Debug.Log("call");
-                }
-                else if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo) == PlayerAnimation.Slide.ToString())
-                {
-                    AnimatorControll(PlayerAnimation.Slide);
-                }
-                else if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo) == PlayerAnimation.Death.ToString())
-                {
-                    AnimatorControll(PlayerAnimation.Death);
-                    col.GetComponent<Animation>().Play("Take 001");
-                    deathFlag = true;
-                }
-            }
+            CollisionCheckMethod(col);
         }
     }
     void OnTriggerExit(Collider col)
     {
-        if (!noDamage && !deathFlag)
+        if (col.CompareTag("Obstacles"))
         {
-            if (col.CompareTag("Obstacles"))
-            {
-                if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo) == PlayerAnimation.Hit.ToString())
-                {
-                    AnimatorControll(PlayerAnimation.Hit);
-                    StartCoroutine(NoDamage(3.0f));
-                    Debug.Log("call");
-                }
-                else if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo) == PlayerAnimation.Slide.ToString())
-                {
-                    AnimatorControll(PlayerAnimation.Slide);
-                }
-                else if (MapManager.Instance.ObstaclesCollisionCheck(col.gameObject, characterAnimInfo) == PlayerAnimation.Death.ToString())
-                {
-                    AnimatorControll(PlayerAnimation.Death);
-                    col.GetComponent<Animation>().Play("Take 001");
-                    deathFlag = true;
-                }
-            }
+            CollisionCheckMethod(col);
         }
     }
 

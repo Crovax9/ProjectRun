@@ -67,8 +67,7 @@ public class MapManager : MonoBehaviour
         int number = SelectedProbability();
         if (distance < 300f)
         {
-            //Level1MapSetting();
-            Level3MapSetting();
+            Level1MapSetting();
         }
         else if (distance >= 300f && distance < 600f)
         {
@@ -96,8 +95,6 @@ public class MapManager : MonoBehaviour
                 Level3MapSetting();
             }
         }
-
-
     }
 
     private int SelectedProbability()
@@ -161,48 +158,5 @@ public class MapManager : MonoBehaviour
         poolLevel3[index].transform.position = setPosition;
         poolLevel3[index].SetActive(true);
         setPosition.z += DISTANCE_MAPS_Z;
-    }
-        
-    public string ObstaclesCollisionCheck(GameObject obstacles, AnimatorStateInfo animState)
-    {
-        if (!animState.IsName("Jump"))
-        {
-            switch (obstacles.name)
-            {
-                case "Stone":
-                    obstacles.GetComponent<MeshSplit>().enabled = true;
-                    return PlayerAnimation.Hit.ToString();
-
-
-                case "Stump":
-                    obstacles.GetComponent<MeshSplit>().enabled = true;
-                    return PlayerAnimation.Hit.ToString();
-
-                case "Banana":
-                    
-                    return PlayerAnimation.Slide.ToString();
-
-                case "Trap":
-                    
-                    return PlayerAnimation.Death.ToString();
-
-                case "Thornbush":
-                    obstacles.GetComponent<MeshSplit>().enabled = true;
-                    return PlayerAnimation.Hit.ToString();
-
-                case "Log":
-                    obstacles.GetComponent<MeshSplit>().enabled = true;
-                    return PlayerAnimation.Hit.ToString();
-
-                case "Root":
-                    obstacles.GetComponent<MeshSplit>().enabled = true;
-                    return PlayerAnimation.Hit.ToString();
-
-                default:
-
-                    break;
-            }
-        }
-        return PlayerAnimation.None.ToString();
     }
 }
