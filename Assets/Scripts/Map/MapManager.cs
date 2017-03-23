@@ -25,12 +25,15 @@ public class MapManager : MonoBehaviour
     public List<GameObject> mapsLevel1;
     public List<GameObject> mapsLevel2;
     public List<GameObject> mapsLevel3;
+    public GameObject cheeseItem;
 
     public List<GameObject> parent;
 
     private static List<GameObject> poolLevel1 = new List<GameObject>();
     private static List<GameObject> poolLevel2 = new List<GameObject>();
     private static List<GameObject> poolLevel3 = new List<GameObject>();
+
+    private static List<GameObject> poolCheese = new List<GameObject>();
 
     private int[] probability = new int[3] {50, 30, 20};
 
@@ -60,6 +63,15 @@ public class MapManager : MonoBehaviour
         poolLevel3.ForEach((c, index) => c.transform.SetParent(parent[2].transform));
 
         poolLevel3.ForEach(c => c.SetActive(false));
+
+        for (int i = 0; i < 50; i++)
+        {
+            poolCheese.Add((GameObject)Instantiate(cheeseItem, Vector3.zero, Quaternion.identity));
+
+        }
+        poolCheese.ForEach((item, index) => item.transform.SetParent(parent[3].transform));
+        poolCheese.ForEach(item => item.SetActive(false));
+
     }
 
     public void MapSpawn(float distance)
@@ -97,6 +109,18 @@ public class MapManager : MonoBehaviour
         }
     }
 
+    public GameObject GetPooledItem()
+    {
+        for (int i = 0; i < poolCheese.Count; i++)
+        {
+            if (!poolCheese[i].activeInHierarchy)
+            {
+                return poolCheese[i];
+            }
+        }
+        return null;
+    }
+        
     private int SelectedProbability()
     {
         float total = 0f;
