@@ -65,7 +65,7 @@ public class Grid : MonoBehaviour
     private void SetItem()
     {
         int index = Random.Range(0, gridSizeX);
-        for (int y = 0; y < gridSizeY; y++)
+        for (int y = 0; y < gridSizeY; y ++)
         {
             GameObject item = MapManager.Instance.GetPooledItem();
 
@@ -77,31 +77,4 @@ public class Grid : MonoBehaviour
             itemList[y] = item;
         }
     }
-
-    /*
-    void OnDrawGizmos()
-    {
-        Gizmos.DrawWireCube(transform.position, new Vector3(gridWorldSize.x, 1, gridWorldSize.y));
-
-        if (grid != null)
-        {
-            for (int i = 0; i < gridSizeX; i++)
-            {
-                for (int j = 0; j < gridSizeY; j++)
-                {
-                    Node n = grid[i, j];
-                    Gizmos.color = (n.installable) ? Color.white : Color.red;
-
-                    if (path != null)
-                    {
-                        if (path.Contains(n))
-                            Gizmos.color = Color.black;
-                    }
-                    Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeDiameter - 0.1f));
-                }
-            }
-        }
-    }
-    */
-
 }

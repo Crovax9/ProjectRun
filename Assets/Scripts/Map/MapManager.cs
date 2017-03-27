@@ -3,14 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-
-
 public class MapManager : MonoBehaviour
 {
     private const float DISTANCE_MAPS_Z = 10.0F;
-
-    private static Vector3 setPosition = new Vector3(0.0f, 0.0f, 43.0f);
-
+    private static Vector3 setPosition = new Vector3(0.0f, 0.0f, 83.0f);
 
     private static MapManager _instance = null;
 
@@ -26,16 +22,17 @@ public class MapManager : MonoBehaviour
     public List<GameObject> mapsLevel2;
     public List<GameObject> mapsLevel3;
     public GameObject cheeseItem;
-
     public List<GameObject> parent;
 
-    private static List<GameObject> poolLevel1 = new List<GameObject>();
-    private static List<GameObject> poolLevel2 = new List<GameObject>();
-    private static List<GameObject> poolLevel3 = new List<GameObject>();
-
+    private static List<GameObject> poolMap = new List<GameObject>();
     private static List<GameObject> poolCheese = new List<GameObject>();
 
     private int[] probability = new int[3] {50, 30, 20};
+
+    private const int level1 = 0;
+    private const int level2 = 1;
+    private const int level3 = 2;
+
 
     void Awake()
     {
@@ -49,62 +46,64 @@ public class MapManager : MonoBehaviour
 
     public void MapInit()
     {
-        mapsLevel1.ForEach((c, index) => poolLevel1.Add((GameObject)Instantiate(c, Vector3.zero, Quaternion.identity)));
-        poolLevel1.ForEach((c, index) => c.transform.SetParent(parent[0].transform));
+        mapsLevel1.ForEach(level1 => poolMap.Add((GameObject)Instantiate(level1, Vector3.zero, Quaternion.identity)));
+        mapsLevel2.ForEach(level2 => poolMap.Add((GameObject)Instantiate(level2, Vector3.zero, Quaternion.identity)));
+        mapsLevel3.ForEach(level3 => poolMap.Add((GameObject)Instantiate(level3, Vector3.zero, Quaternion.identity)));
 
-        poolLevel1.ForEach(c => c.SetActive(false));
+        poolMap.ForEach(map => map.SetActive(false));
 
-        mapsLevel2.ForEach((c, index) => poolLevel2.Add((GameObject)Instantiate(c, Vector3.zero, Quaternion.identity)));
-        poolLevel2.ForEach((c, index) => c.transform.SetParent(parent[1].transform));
+        for (int i = 0; i < 10; i++)
+        {
+            poolMap[i].transform.SetParent(parent[0].transform);
+        }
+        for (int i = 10; i < 20; i++)
+        {
+            poolMap[i].transform.SetParent(parent[1].transform);
+        }
+        for (int i = 20; i < 30; i++)
+        {
+            poolMap[i].transform.SetParent(parent[2].transform);
+        }
 
-        poolLevel2.ForEach(c => c.SetActive(false));
-
-        mapsLevel3.ForEach((c, index) => poolLevel3.Add((GameObject)Instantiate(c, Vector3.zero, Quaternion.identity)));
-        poolLevel3.ForEach((c, index) => c.transform.SetParent(parent[2].transform));
-
-        poolLevel3.ForEach(c => c.SetActive(false));
-
-        for (int i = 0; i < 50; i++)
+        for (int i = 0; i < 100; i++)
         {
             poolCheese.Add((GameObject)Instantiate(cheeseItem, Vector3.zero, Quaternion.identity));
-
         }
-        poolCheese.ForEach((item, index) => item.transform.SetParent(parent[3].transform));
+        poolCheese.ForEach(item => item.transform.SetParent(parent[3].transform));
         poolCheese.ForEach(item => item.SetActive(false));
-
     }
 
     public void MapSpawn(float distance)
     {
-        int number = SelectedProbability();
+        int number = MapSpawndProbability();
         if (distance < 300f)
         {
-            Level1MapSetting();
+            MapSpawn(level1);
         }
         else if (distance >= 300f && distance < 600f)
         {
             if (number != 1)
             {
-                Level1MapSetting();
+                MapSpawn(level1);
             }
             else
             {
-                Level2MapSetting();
+                MapSpawn(level2);
             }
         }
         else if (distance >= 600f)
         {
-            if (number == 1)
+            if (number == 0)
             {
-                Level1MapSetting();
+                MapSpawn(level1);   
             }
-            else if (number == 2)
+            else if (number == 1)
             {
-                Level2MapSetting();
+                MapSpawn(level2);
             }
             else
             {
-                Level3MapSetting();
+                MapSpawn(level3);
             }
         }
     }
@@ -121,7 +120,7 @@ public class MapManager : MonoBehaviour
         return null;
     }
         
-    private int SelectedProbability()
+    private int MapSpawndProbability()
     {
         float total = 0f;
         foreach (float elem in probability)
@@ -145,42 +144,36 @@ public class MapManager : MonoBehaviour
         return probability.Length - 1;
     }
 
-    private void Level1MapSetting()
+    private void MapSpawn(int probability)
     {
-        int index = Random.Range(0, poolLevel1.Count);
-        if (poolLevel1[index].activeInHierarchy)
+        int index = 0;
+        switch (probability)
         {
-            Level1MapSetting();
-            return;
-        }
-        poolLevel1[index].transform.position = setPosition;
-        poolLevel1[index].SetActive(true);
-        setPosition.z += DISTANCE_MAPS_Z;
-    }
+            case level1:
+                index = Random.Range(0, 10);
+                break;
 
-    private void Level2MapSetting()
-    {
-        int index = Random.Range(0, poolLevel2.Count);
-        if (poolLevel2[index].activeInHierarchy)
-        {
-            Level2MapSetting();
-            return;
-        }
-        poolLevel2[index].transform.position = setPosition;
-        poolLevel2[index].SetActive(true);
-        setPosition.z += DISTANCE_MAPS_Z;
-    }
+            case level2:
+                index = Random.Range(10, 20);
+                break;
 
-    private void Level3MapSetting()
-    {
-        int index = Random.Range(0, poolLevel3.Count);
-        if (poolLevel3[index].activeInHierarchy)
-        {
-            Level3MapSetting();
-            return;
+            case level3:
+                index = Random.Range(20, 30);
+                break;
+
+            default:
+
+                break;
         }
-        poolLevel3[index].transform.position = setPosition;
-        poolLevel3[index].SetActive(true);
-        setPosition.z += DISTANCE_MAPS_Z;
+        if (!poolMap[index].activeInHierarchy)
+        {
+            poolMap[index].transform.position = setPosition;
+            poolMap[index].SetActive(true);
+            setPosition.z += DISTANCE_MAPS_Z;
+        }
+        else
+        {
+            MapSpawn(probability);
+        }
     }
 }

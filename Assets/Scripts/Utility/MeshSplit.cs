@@ -10,7 +10,7 @@ public class MeshSplit : MonoBehaviour {
 
     public IEnumerator SplitMesh(bool destroy)
     {
-        if (GetComponent<MeshFilter>() == null)// || GetComponent<SkinnedMeshRenderer>() == null)
+        if (GetComponent<MeshFilter>() == null)
         {
             yield return null;
         }
@@ -25,22 +25,12 @@ public class MeshSplit : MonoBehaviour {
         {
             M = GetComponent<MeshFilter>().mesh;
         }
- /*       else if (GetComponent<SkinnedMeshRenderer>())
-        {
-            M = GetComponent<SkinnedMeshRenderer>().sharedMesh;
-        }
-*/
+
         Material[] materials = new Material[0];
         if (GetComponent<MeshRenderer>())
         {
             materials = GetComponent<MeshRenderer>().materials;
         }
-        /*
-        else if (GetComponent<SkinnedMeshRenderer>())
-        {
-            materials = GetComponent<SkinnedMeshRenderer>().materials;
-        }
-        */
 
         Vector3[] verts = M.vertices;
         Vector3[] normals = M.normals;

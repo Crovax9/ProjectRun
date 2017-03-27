@@ -11,14 +11,6 @@ public class Node
 
     public Node parent;
 
-/*    public int gCost;
-    public int hCost;
-
-    public int fCost
-    {
-        get{ return gCost + hCost; }
-    }*/
-
     public Node(bool _installable, Vector3 _worldPos, int _gridX, int _gridY)
     {
         installable = _installable;

@@ -14,8 +14,6 @@ public enum PlayerAnimation
     Slip = 7,
     Death = 8,
 
-
-
     None = 20,
 
 }
@@ -55,6 +53,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+
         characterAnimInfo = playerAnim.GetCurrentAnimatorStateInfo(0);
         if (SwipeManager.Instance.isSwiping(SwipeDirection.Left))
         {
