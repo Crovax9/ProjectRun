@@ -147,33 +147,30 @@ public class MapManager : MonoBehaviour
     private void MapSpawn(int probability)
     {
         int index = 0;
-        switch (probability)
+        if (probability == level1)
         {
-            case level1:
-                index = Random.Range(0, 10);
-                break;
-
-            case level2:
-                index = Random.Range(10, 20);
-                break;
-
-            case level3:
-                index = Random.Range(20, 30);
-                break;
-
-            default:
-
-                break;
+            index = Random.Range(0, 10);
         }
+        else if (probability == level2)
+        {
+            index = Random.Range(10, 20);
+        }
+        else if (probability == level3)
+        {
+            index = Random.Range(20, 30);
+        }
+
         if (!poolMap[index].activeInHierarchy)
         {
             poolMap[index].transform.position = setPosition;
             poolMap[index].SetActive(true);
-            setPosition.z += DISTANCE_MAPS_Z;
         }
         else
         {
-            MapSpawn(probability);
+            var selected = poolMap.Where(map => map.activeInHierarchy == false).First();
+            selected.transform.position = setPosition;
+            selected.SetActive(true);
         }
+        setPosition.z += DISTANCE_MAPS_Z;
     }
 }

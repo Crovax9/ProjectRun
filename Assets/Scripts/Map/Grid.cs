@@ -14,7 +14,7 @@ public class Grid : MonoBehaviour
     private int gridSizeX;
     private int gridSizeY;
 
-    private GameObject[] itemList = new GameObject[9];
+    private GameObject[] itemList = new GameObject[5];
 
     private int num = 0;
 
@@ -54,7 +54,7 @@ public class Grid : MonoBehaviour
         {
             for (int y = 0; y < gridSizeY; y++)
             {
-                Vector3 worldPoint = worldBottomLeft + new Vector3(x * nodeDiameter + nodeRadius, 0, y * nodeDiameter + nodeRadius);
+                Vector3 worldPoint = worldBottomLeft + new Vector3(x * nodeDiameter + nodeRadius, 0.5f, y * nodeDiameter + nodeRadius);
 
                 bool installable = !(Physics.CheckSphere(worldPoint, nodeRadius, installableMask));
                 grid[x, y] = new Node(installable, worldPoint, x, y);
@@ -65,16 +65,21 @@ public class Grid : MonoBehaviour
     private void SetItem()
     {
         int index = Random.Range(0, gridSizeX);
-        for (int y = 0; y < gridSizeY; y ++)
+        int ListNum = 0;
+        for (int y = 0; y < gridSizeY; y+=2)
         {
             GameObject item = MapManager.Instance.GetPooledItem();
 
             if (item == null)
                 return;
 
-            item.transform.position = grid[index, y].worldPosition;
-            item.SetActive(true);
-            itemList[y] = item;
+            if (grid[index, y].installable)
+            {
+                item.transform.position = grid[index, y].worldPosition;
+                item.SetActive(true);
+            }
+            itemList[ListNum] = item;
+            ListNum++;
         }
     }
 }

@@ -15,7 +15,6 @@ public enum PlayerAnimation
     Death = 8,
 
     None = 20,
-
 }
 
 public class PlayerController : MonoBehaviour
@@ -34,14 +33,41 @@ public class PlayerController : MonoBehaviour
     private bool deathFlag = false;
     private bool noDamage = false;
     private float dummyMoveSpeed = 5.0f;
+    private int cheeseNum = 0;
 
-    void Start()
+    void Awake()
     {
         moveDummy = GameObject.Find("MoveDummy").transform;
         player = GameObject.Find("Boar").transform;
     }
 
     void FixedUpdate()
+    {
+        CharacterTranslate();
+    }
+
+    void Update()
+    {
+        CharacterControl();
+    }
+
+    void LateUpdate()
+    {
+        UIManager.Instance.Score((int)PlayerDistance(), CheeseNum());
+    }
+
+    private float PlayerDistance()
+    {
+        return player.position.z;
+    }
+
+    private int CheeseNum()
+    {
+        return cheeseNum;
+    }
+
+
+    private void CharacterTranslate()
     {
         if (!deathFlag)
         {
@@ -51,11 +77,14 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void Update()
+    private void CharacterControl()
     {
-
         characterAnimInfo = playerAnim.GetCurrentAnimatorStateInfo(0);
-        if (SwipeManager.Instance.isSwiping(SwipeDirection.Left))
+        if (SwipeManager.Instance.isSwiping(SwipeDirection.Up) || SwipeManager.Instance.isSwiping(SwipeDirection.LeftUp) || SwipeManager.Instance.isSwiping(SwipeDirection.RightUp))
+        {
+            AnimatorControll(PlayerAnimation.Jump);
+        }
+        else if (SwipeManager.Instance.isSwiping(SwipeDirection.Left))
         {
             if (player.position.x > -2.0f)
             {
@@ -68,10 +97,6 @@ public class PlayerController : MonoBehaviour
             {
                 AnimatorControll(PlayerAnimation.Right);
             }
-        }
-        else if (SwipeManager.Instance.isSwiping(SwipeDirection.Up))
-        {
-            AnimatorControll(PlayerAnimation.Jump);
         }
     }
 
@@ -115,10 +140,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private float PlayerDistance()
-    {
-        return player.position.z;
-    }
+
 
     private void DummyMove(PlayerAnimation direction)
     {
@@ -159,7 +181,6 @@ public class PlayerController : MonoBehaviour
                         Debug.Log("Hit");
                         break;
                 }
-
             }
             else if (characterAnimInfo.IsTag("Jump"))
             {
@@ -214,12 +235,23 @@ public class PlayerController : MonoBehaviour
         {
             CollisionCheckMethod(col);
         }
+        if (col.CompareTag("Item"))
+        {
+            col.gameObject.SetActive(false);
+            cheeseNum += 1;
+        }
     }
+
     void OnTriggerStay(Collider col)
     {
         if (col.CompareTag("Obstacles"))
         {
             CollisionCheckMethod(col);
+        }
+        if (col.CompareTag("Item"))
+        {
+            col.gameObject.SetActive(false);
+            cheeseNum += 1;
         }
     }
     void OnTriggerExit(Collider col)
@@ -228,7 +260,10 @@ public class PlayerController : MonoBehaviour
         {
             CollisionCheckMethod(col);
         }
+        if (col.CompareTag("Item"))
+        {
+            col.gameObject.SetActive(false);
+            cheeseNum += 1;
+        }
     }
-
-
 }
