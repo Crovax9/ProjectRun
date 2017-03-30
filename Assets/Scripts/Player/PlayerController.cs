@@ -53,7 +53,7 @@ public class PlayerController : MonoBehaviour
 
     void LateUpdate()
     {
-        UIManager.Instance.Score((int)PlayerDistance(), CheeseNum());
+        GameManager.Instance.Score((int)PlayerDistance(), CheeseNum());
     }
 
     private float PlayerDistance()
@@ -168,16 +168,26 @@ public class PlayerController : MonoBehaviour
                         break;
 
                     case "Trap":
-                        AnimatorControll(PlayerAnimation.Death);
                         col.GetComponent<Animation>().Play("Take 001");
+                        AnimatorControll(PlayerAnimation.Death);
+                        UIManager.Instance.HPMinus(1.0f);
                         deathFlag = true;
                         Debug.Log("Death");
                         break;
 
                     default:
                         col.GetComponent<MeshSplit>().enabled = true;
-                        AnimatorControll(PlayerAnimation.Hit);
-                        StartCoroutine(NoDamage(3.0f));
+                        UIManager.Instance.HPMinus(0.35f);
+                        if (UIManager.Instance.heart.fillAmount == 0)
+                        {
+                            AnimatorControll(PlayerAnimation.Death);
+                            deathFlag = true;
+                        }
+                        else
+                        {
+                            AnimatorControll(PlayerAnimation.Hit);
+                            StartCoroutine(NoDamage(3.0f));
+                        }
                         Debug.Log("Hit");
                         break;
                 }
@@ -187,15 +197,31 @@ public class PlayerController : MonoBehaviour
                 if (col.name == "Rock")
                 {
                     col.GetComponent<MeshSplit>().enabled = true;
-                    AnimatorControll(PlayerAnimation.Hit);
-                    StartCoroutine(NoDamage(3.0f));
+                    if (UIManager.Instance.heart.fillAmount == 0)
+                    {
+                        AnimatorControll(PlayerAnimation.Death);
+                        deathFlag = true;
+                    }
+                    else
+                    {
+                        AnimatorControll(PlayerAnimation.Hit);
+                        StartCoroutine(NoDamage(3.0f));
+                    }
                     Debug.Log("Hit");
                 }
                 else if (col.name == "Root")
                 {
                     col.GetComponent<MeshSplit>().enabled = true;
-                    AnimatorControll(PlayerAnimation.Hit);
-                    StartCoroutine(NoDamage(3.0f));
+                    if (UIManager.Instance.heart.fillAmount == 0)
+                    {
+                        AnimatorControll(PlayerAnimation.Death);
+                        deathFlag = true;
+                    }
+                    else
+                    {
+                        AnimatorControll(PlayerAnimation.Hit);
+                        StartCoroutine(NoDamage(3.0f));
+                    }
                     Debug.Log("Hit");
                 }
             }

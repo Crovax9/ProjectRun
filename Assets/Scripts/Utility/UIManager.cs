@@ -4,8 +4,8 @@ using System.Collections;
 public class UIManager : MonoBehaviour
 {
     public UILabel scoreBoard;
+    public UISprite heart;
 
-    private int score = 0;
 
     private static UIManager _instance = null;
 
@@ -24,13 +24,18 @@ public class UIManager : MonoBehaviour
 
     void LateUpdate()
     {
-        scoreBoard.text = score.ToString();
+        ScoreBoard();
     }
-        
 
-    public void Score(int distance, int cheese)
+    private void ScoreBoard()
     {
-        score = distance + cheese;
-        //return score;
+        scoreBoard.text = GameManager.Instance.Score().ToString();
     }
+
+    public void HPMinus(float minus)
+    {
+        heart.fillAmount -= minus;
+    }
+
+
 }
