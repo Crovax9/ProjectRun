@@ -7,6 +7,11 @@ public class GameManager
 
     private int score = 0;
 
+    private const int cheeseScore = 10;
+    private const int feverBonus = 20;
+
+    private bool feverMode = false;
+
     public static GameManager Instance
     {
         get{
@@ -15,9 +20,36 @@ public class GameManager
         }
     }
 
-    public void Score(int distance, int cheese)
+    public bool FeverMode
     {
-        score = distance + cheese;
+        get
+        {
+            return feverMode;
+        }
+
+        set
+        {
+            feverMode = value;
+        }
+    }
+
+    public void CheeseScore()
+    {
+        if (FeverMode == false)
+        {
+            score += cheeseScore;
+            UIManager.Instance.CheeseScoreBoard(cheeseScore);
+        }
+        else
+        {
+            score += cheeseScore + feverBonus;
+            UIManager.Instance.CheeseScoreBoard(cheeseScore + feverBonus);
+        }
+    }
+
+    public void Score(int distance)
+    {
+        score = distance;
     }
 
     public int Score()

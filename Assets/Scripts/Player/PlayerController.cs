@@ -29,11 +29,11 @@ public class PlayerController : MonoBehaviour
     private AnimatorStateInfo characterAnimInfo;
     
 
-    private const float moveSpeed = 7.0f;
+    private const float moveSpeed = 8.0f;
     private bool deathFlag = false;
     private bool noDamage = false;
-    private float dummyMoveSpeed = 5.0f;
-    private int cheeseNum = 0;
+    private float dummyMoveSpeed = 6.0f;
+    private const int cheeseScore = 10;
 
     void Awake()
     {
@@ -53,17 +53,12 @@ public class PlayerController : MonoBehaviour
 
     void LateUpdate()
     {
-        GameManager.Instance.Score((int)PlayerDistance(), CheeseNum());
+        GameManager.Instance.Score((int)PlayerDistance());
     }
 
     private float PlayerDistance()
     {
         return player.position.z;
-    }
-
-    private int CheeseNum()
-    {
-        return cheeseNum;
     }
 
 
@@ -169,24 +164,30 @@ public class PlayerController : MonoBehaviour
 
                     case "Trap":
                         col.GetComponent<Animation>().Play("Take 001");
-                        AnimatorControll(PlayerAnimation.Death);
-                        UIManager.Instance.HPMinus(1.0f);
-                        deathFlag = true;
-                        Debug.Log("Death");
+                        if (GameManager.Instance.FeverMode == false)
+                        {
+                            AnimatorControll(PlayerAnimation.Death);
+                            UIManager.Instance.HPMinus(1.0f);
+                            deathFlag = true;
+                            Debug.Log("Death");
+                        }
                         break;
 
                     default:
                         col.GetComponent<MeshSplit>().enabled = true;
-                        UIManager.Instance.HPMinus(0.35f);
-                        if (UIManager.Instance.heart.fillAmount == 0)
+                        if (GameManager.Instance.FeverMode == false)
                         {
-                            AnimatorControll(PlayerAnimation.Death);
-                            deathFlag = true;
-                        }
-                        else
-                        {
-                            AnimatorControll(PlayerAnimation.Hit);
-                            StartCoroutine(NoDamage(3.0f));
+                            UIManager.Instance.HPMinus(0.35f);
+                            if (UIManager.Instance.heart.fillAmount == 0)
+                            {
+                                AnimatorControll(PlayerAnimation.Death);
+                                deathFlag = true;
+                            }
+                            else
+                            {
+                                AnimatorControll(PlayerAnimation.Hit);
+                                StartCoroutine(NoDamage(3.0f));
+                            }
                         }
                         Debug.Log("Hit");
                         break;
@@ -197,30 +198,36 @@ public class PlayerController : MonoBehaviour
                 if (col.name == "Rock")
                 {
                     col.GetComponent<MeshSplit>().enabled = true;
-                    if (UIManager.Instance.heart.fillAmount == 0)
+                    if (GameManager.Instance.FeverMode == false)
                     {
-                        AnimatorControll(PlayerAnimation.Death);
-                        deathFlag = true;
-                    }
-                    else
-                    {
-                        AnimatorControll(PlayerAnimation.Hit);
-                        StartCoroutine(NoDamage(3.0f));
+                        if (UIManager.Instance.heart.fillAmount == 0)
+                        {
+                            AnimatorControll(PlayerAnimation.Death);
+                            deathFlag = true;
+                        }
+                        else
+                        {
+                            AnimatorControll(PlayerAnimation.Hit);
+                            StartCoroutine(NoDamage(3.0f));
+                        }
                     }
                     Debug.Log("Hit");
                 }
                 else if (col.name == "Root")
                 {
                     col.GetComponent<MeshSplit>().enabled = true;
-                    if (UIManager.Instance.heart.fillAmount == 0)
+                    if (GameManager.Instance.FeverMode == false)
                     {
-                        AnimatorControll(PlayerAnimation.Death);
-                        deathFlag = true;
-                    }
-                    else
-                    {
-                        AnimatorControll(PlayerAnimation.Hit);
-                        StartCoroutine(NoDamage(3.0f));
+                        if (UIManager.Instance.heart.fillAmount == 0)
+                        {
+                            AnimatorControll(PlayerAnimation.Death);
+                            deathFlag = true;
+                        }
+                        else
+                        {
+                            AnimatorControll(PlayerAnimation.Hit);
+                            StartCoroutine(NoDamage(3.0f));
+                        }
                     }
                     Debug.Log("Hit");
                 }
@@ -264,7 +271,11 @@ public class PlayerController : MonoBehaviour
         if (col.CompareTag("Item"))
         {
             col.gameObject.SetActive(false);
-            cheeseNum += 1;
+            GameManager.Instance.CheeseScore();
+            if (GameManager.Instance.FeverMode == false)
+            {
+                UIManager.Instance.CheeseSpritePlus();
+            }
         }
     }
 
@@ -277,7 +288,11 @@ public class PlayerController : MonoBehaviour
         if (col.CompareTag("Item"))
         {
             col.gameObject.SetActive(false);
-            cheeseNum += 1;
+            GameManager.Instance.CheeseScore();
+            if (GameManager.Instance.FeverMode == false)
+            {
+                UIManager.Instance.CheeseSpritePlus();
+            }
         }
     }
     void OnTriggerExit(Collider col)
@@ -289,7 +304,11 @@ public class PlayerController : MonoBehaviour
         if (col.CompareTag("Item"))
         {
             col.gameObject.SetActive(false);
-            cheeseNum += 1;
+            GameManager.Instance.CheeseScore();
+            if (GameManager.Instance.FeverMode == false)
+            {
+                UIManager.Instance.CheeseSpritePlus();
+            }
         }
     }
 }
