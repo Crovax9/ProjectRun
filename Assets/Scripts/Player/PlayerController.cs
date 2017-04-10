@@ -33,7 +33,7 @@ public class PlayerController : MonoBehaviour
     private bool deathFlag = false;
     private bool noDamage = false;
     private float dummyMoveSpeed = 6.0f;
-    private const int cheeseScore = 10;
+
 
     void Awake()
     {
@@ -54,6 +54,7 @@ public class PlayerController : MonoBehaviour
     void LateUpdate()
     {
         GameManager.Instance.Score((int)PlayerDistance());
+
     }
 
     private float PlayerDistance()

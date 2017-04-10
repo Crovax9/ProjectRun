@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEditor.SceneManagement;
 
 public class GameManager
 {
@@ -26,7 +27,6 @@ public class GameManager
         {
             return feverMode;
         }
-
         set
         {
             feverMode = value;

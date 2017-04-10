@@ -29,10 +29,6 @@ public class UIManager : MonoBehaviour
     void Awake()
     {
         _instance = this;
-    }
-
-    void LateUpdate()
-    {
         ScoreBoard();
     }
 
@@ -54,7 +50,16 @@ public class UIManager : MonoBehaviour
 
     private void ScoreBoard()
     {
-        scoreBoard.text = GameManager.Instance.Score().ToString();
+        StartCoroutine(ScoreBoardRoutine());
+    }
+
+    IEnumerator ScoreBoardRoutine()
+    {
+        while (true)
+        {
+            scoreBoard.text = GameManager.Instance.Score().ToString();
+            yield return new WaitForSeconds(2.0f);
+        }
     }
 
     public void HPMinus(float minus)
