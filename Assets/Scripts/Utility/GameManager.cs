@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using UnityEditor.SceneManagement;
+using UnityEngine.SceneManagement;
 
 public class GameManager
 {
@@ -55,5 +55,10 @@ public class GameManager
     public int Score()
     {
         return score;
+    }
+
+    public void SceneMove(string sceneName)
+    {
+        SceneManager.LoadScene(sceneName);
     }
 }

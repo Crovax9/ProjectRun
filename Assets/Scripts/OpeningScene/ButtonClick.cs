@@ -3,9 +3,9 @@ using System.Collections;
 
 public class ButtonClick : MonoBehaviour
 {
-    void StartClick()
+    public void StartClick()
     {
-
+        GameManager.Instance.SceneMove("Main");
     }
 
     void RankClick()

@@ -7,6 +7,8 @@ public class CharacterAnim : MonoBehaviour
     GameObject target;
     [SerializeField]
     Animator animator;
+    [SerializeField]
+    TweenAlpha tween;
 
     void Start()
     {
@@ -27,6 +29,7 @@ public class CharacterAnim : MonoBehaviour
         if (col.CompareTag("Finish"))
         {
             animator.SetInteger("Moving", 9);
+            tween.enabled = true;
         }
     }
 }
