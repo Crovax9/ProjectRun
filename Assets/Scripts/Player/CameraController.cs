@@ -10,12 +10,11 @@ public class CameraController : MonoBehaviour
     {
         offset = transform.position - target.transform.position;
     }
-        
-    void FixedUpdate () 
+
+    private void LateUpdate()
     {
         if (target != null)
         {
-            //transform.LookAt(target.transform);
             transform.position = target.transform.position + offset;
         }
     }

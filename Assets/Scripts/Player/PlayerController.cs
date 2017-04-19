@@ -14,10 +14,7 @@ public enum PlayerAnimation
     Slip = 7,
     Death = 8,
 
-
-
     None = 20,
-
 }
 
 public class PlayerController : MonoBehaviour
@@ -32,31 +29,60 @@ public class PlayerController : MonoBehaviour
     private AnimatorStateInfo characterAnimInfo;
     
 
-    private const float moveSpeed = 7.0f;
+    private const float moveSpeed = 8.0f;
     private bool deathFlag = false;
     private bool noDamage = false;
-    private float dummyMoveSpeed = 5.0f;
+    private float dummyMoveSpeed = 6.0f;
 
-    void Start()
+
+    void Awake()
     {
         moveDummy = GameObject.Find("MoveDummy").transform;
         player = GameObject.Find("Boar").transform;
     }
 
-    void FixedUpdate()
+    void Update()
+    {
+        CharacterTranslate();
+        CharacterControl();
+    }
+
+    void LateUpdate()
+    {
+        playerAnim.SetInteger("Moving", 0);
+        GameManager.Instance.Score((int)PlayerDistance());
+
+    }
+
+    private float PlayerDistance()
+    {
+        return player.position.z;
+    }
+
+
+    private void CharacterTranslate()
     {
         if (!deathFlag)
         {
             moveDummy.Translate(0, 0, dummyMoveSpeed * Time.deltaTime);
-            playerAnim.SetInteger("Moving", 0);
+            //playerAnim.SetInteger("Moving", 0);
             player.position = Vector3.MoveTowards(transform.position, moveDummy.position, moveSpeed * Time.deltaTime);
+        }
+        else
+        {
+            GameManager.Instance.FeverMode = false;
+            UIManager.Instance.tweenPosition.PlayForward();
         }
     }
 
-    void Update()
+    private void CharacterControl()
     {
         characterAnimInfo = playerAnim.GetCurrentAnimatorStateInfo(0);
-        if (SwipeManager.Instance.isSwiping(SwipeDirection.Left))
+        if (SwipeManager.Instance.isSwiping(SwipeDirection.Up) || SwipeManager.Instance.isSwiping(SwipeDirection.LeftUp) || SwipeManager.Instance.isSwiping(SwipeDirection.RightUp))
+        {
+            AnimatorControll(PlayerAnimation.Jump);
+        }
+        else if (SwipeManager.Instance.isSwiping(SwipeDirection.Left))
         {
             if (player.position.x > -2.0f)
             {
@@ -69,10 +95,6 @@ public class PlayerController : MonoBehaviour
             {
                 AnimatorControll(PlayerAnimation.Right);
             }
-        }
-        else if (SwipeManager.Instance.isSwiping(SwipeDirection.Up))
-        {
-            AnimatorControll(PlayerAnimation.Jump);
         }
     }
 
@@ -116,10 +138,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private float PlayerDistance()
-    {
-        return player.position.z;
-    }
+
 
     private void DummyMove(PlayerAnimation direction)
     {
@@ -147,35 +166,72 @@ public class PlayerController : MonoBehaviour
                         break;
 
                     case "Trap":
-                        AnimatorControll(PlayerAnimation.Death);
                         col.GetComponent<Animation>().Play("Take 001");
-                        deathFlag = true;
-                        Debug.Log("Death");
+                        if (GameManager.Instance.FeverMode == false)
+                        {
+                            AnimatorControll(PlayerAnimation.Death);
+                            UIManager.Instance.HPMinus(1.0f);
+                            deathFlag = true;
+                            Debug.Log("Death");
+                        }
                         break;
 
                     default:
                         col.GetComponent<MeshSplit>().enabled = true;
-                        AnimatorControll(PlayerAnimation.Hit);
-                        StartCoroutine(NoDamage(3.0f));
+                        if (GameManager.Instance.FeverMode == false)
+                        {
+                            UIManager.Instance.HPMinus(0.35f);
+                            if (UIManager.Instance.heart.fillAmount == 0)
+                            {
+                                AnimatorControll(PlayerAnimation.Death);
+                                deathFlag = true;
+                            }
+                            else
+                            {
+                                AnimatorControll(PlayerAnimation.Hit);
+                                StartCoroutine(NoDamage(3.0f));
+                            }
+                        }
                         Debug.Log("Hit");
                         break;
                 }
-
             }
             else if (characterAnimInfo.IsTag("Jump"))
             {
                 if (col.name == "Rock")
                 {
                     col.GetComponent<MeshSplit>().enabled = true;
-                    AnimatorControll(PlayerAnimation.Hit);
-                    StartCoroutine(NoDamage(3.0f));
+                    if (GameManager.Instance.FeverMode == false)
+                    {
+                        if (UIManager.Instance.heart.fillAmount == 0)
+                        {
+                            AnimatorControll(PlayerAnimation.Death);
+                            deathFlag = true;
+                        }
+                        else
+                        {
+                            AnimatorControll(PlayerAnimation.Hit);
+                            StartCoroutine(NoDamage(3.0f));
+                        }
+                    }
                     Debug.Log("Hit");
                 }
                 else if (col.name == "Root")
                 {
                     col.GetComponent<MeshSplit>().enabled = true;
-                    AnimatorControll(PlayerAnimation.Hit);
-                    StartCoroutine(NoDamage(3.0f));
+                    if (GameManager.Instance.FeverMode == false)
+                    {
+                        if (UIManager.Instance.heart.fillAmount == 0)
+                        {
+                            AnimatorControll(PlayerAnimation.Death);
+                            deathFlag = true;
+                        }
+                        else
+                        {
+                            AnimatorControll(PlayerAnimation.Hit);
+                            StartCoroutine(NoDamage(3.0f));
+                        }
+                    }
                     Debug.Log("Hit");
                 }
             }
@@ -215,12 +271,31 @@ public class PlayerController : MonoBehaviour
         {
             CollisionCheckMethod(col);
         }
+        if (col.CompareTag("Item"))
+        {
+            col.gameObject.SetActive(false);
+            GameManager.Instance.CheeseScore();
+            if (GameManager.Instance.FeverMode == false)
+            {
+                UIManager.Instance.CheeseSpritePlus();
+            }
+        }
     }
+
     void OnTriggerStay(Collider col)
     {
         if (col.CompareTag("Obstacles"))
         {
             CollisionCheckMethod(col);
+        }
+        if (col.CompareTag("Item"))
+        {
+            col.gameObject.SetActive(false);
+            GameManager.Instance.CheeseScore();
+            if (GameManager.Instance.FeverMode == false)
+            {
+                UIManager.Instance.CheeseSpritePlus();
+            }
         }
     }
     void OnTriggerExit(Collider col)
@@ -229,7 +304,14 @@ public class PlayerController : MonoBehaviour
         {
             CollisionCheckMethod(col);
         }
+        if (col.CompareTag("Item"))
+        {
+            col.gameObject.SetActive(false);
+            GameManager.Instance.CheeseScore();
+            if (GameManager.Instance.FeverMode == false)
+            {
+                UIManager.Instance.CheeseSpritePlus();
+            }
+        }
     }
-
-
 }

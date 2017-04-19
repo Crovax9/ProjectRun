@@ -10,7 +10,7 @@ public class MeshSplit : MonoBehaviour {
 
     public IEnumerator SplitMesh(bool destroy)
     {
-        if (GetComponent<MeshFilter>() == null)// || GetComponent<SkinnedMeshRenderer>() == null)
+        if (GetComponent<MeshFilter>() == null)
         {
             yield return null;
         }
@@ -25,22 +25,12 @@ public class MeshSplit : MonoBehaviour {
         {
             M = GetComponent<MeshFilter>().mesh;
         }
- /*       else if (GetComponent<SkinnedMeshRenderer>())
-        {
-            M = GetComponent<SkinnedMeshRenderer>().sharedMesh;
-        }
-*/
+
         Material[] materials = new Material[0];
         if (GetComponent<MeshRenderer>())
         {
             materials = GetComponent<MeshRenderer>().materials;
         }
-        /*
-        else if (GetComponent<SkinnedMeshRenderer>())
-        {
-            materials = GetComponent<SkinnedMeshRenderer>().materials;
-        }
-        */
 
         Vector3[] verts = M.vertices;
         Vector3[] normals = M.normals;
@@ -69,12 +59,15 @@ public class MeshSplit : MonoBehaviour {
 
                 mesh.triangles = new int[]{ 0, 1, 2, 2, 1, 0 };
 
+                
+
                 GameObject GO = new GameObject("Triangle " + (i / 3));
                 GO.transform.position = transform.position;
                 GO.transform.rotation = transform.rotation;
                 GO.AddComponent<MeshRenderer>().material = materials[submesh];
                 GO.AddComponent<MeshFilter>().mesh = mesh;
                 GO.AddComponent<BoxCollider>();
+                GO.layer = 10;
                 Vector3 explosionPos = new Vector3(transform.position.x + Random.Range(-0.5f, 0.5f), transform.position.y + Random.Range(0f, 0.5f), transform.position.z + Random.Range(-0.5f, 0.5f));
 
                 GO.AddComponent<Rigidbody>().AddExplosionForce(Random.Range(300, 500), explosionPos, 5);

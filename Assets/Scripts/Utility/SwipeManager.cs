@@ -8,6 +8,8 @@ public enum SwipeDirection
     Right = 2,
     Up = 4,
     Down = 8,
+    LeftUp = 5,
+    RightUp = 6,
 }
 
 
