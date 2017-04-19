@@ -41,18 +41,15 @@ public class PlayerController : MonoBehaviour
         player = GameObject.Find("Boar").transform;
     }
 
-    void FixedUpdate()
-    {
-        CharacterTranslate();
-    }
-
     void Update()
     {
+        CharacterTranslate();
         CharacterControl();
     }
 
     void LateUpdate()
     {
+        playerAnim.SetInteger("Moving", 0);
         GameManager.Instance.Score((int)PlayerDistance());
 
     }
@@ -68,8 +65,13 @@ public class PlayerController : MonoBehaviour
         if (!deathFlag)
         {
             moveDummy.Translate(0, 0, dummyMoveSpeed * Time.deltaTime);
-            playerAnim.SetInteger("Moving", 0);
+            //playerAnim.SetInteger("Moving", 0);
             player.position = Vector3.MoveTowards(transform.position, moveDummy.position, moveSpeed * Time.deltaTime);
+        }
+        else
+        {
+            GameManager.Instance.FeverMode = false;
+            UIManager.Instance.tweenPosition.PlayForward();
         }
     }
 

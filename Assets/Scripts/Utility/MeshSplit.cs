@@ -59,12 +59,15 @@ public class MeshSplit : MonoBehaviour {
 
                 mesh.triangles = new int[]{ 0, 1, 2, 2, 1, 0 };
 
+                
+
                 GameObject GO = new GameObject("Triangle " + (i / 3));
                 GO.transform.position = transform.position;
                 GO.transform.rotation = transform.rotation;
                 GO.AddComponent<MeshRenderer>().material = materials[submesh];
                 GO.AddComponent<MeshFilter>().mesh = mesh;
                 GO.AddComponent<BoxCollider>();
+                GO.layer = 10;
                 Vector3 explosionPos = new Vector3(transform.position.x + Random.Range(-0.5f, 0.5f), transform.position.y + Random.Range(0f, 0.5f), transform.position.z + Random.Range(-0.5f, 0.5f));
 
                 GO.AddComponent<Rigidbody>().AddExplosionForce(Random.Range(300, 500), explosionPos, 5);

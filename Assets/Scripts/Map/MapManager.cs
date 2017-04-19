@@ -6,7 +6,7 @@ using System.Linq;
 public class MapManager : MonoBehaviour
 {
     private const float DISTANCE_MAPS_Z = 10.0F;
-    private static Vector3 setPosition = new Vector3(0.0f, 0.0f, 83.0f);
+    private Vector3 setPosition = new Vector3(0.0f, 0.0f, 83.0f);
 
     private static MapManager _instance = null;
 
@@ -24,8 +24,8 @@ public class MapManager : MonoBehaviour
     public GameObject cheeseItem;
     public List<GameObject> parent;
 
-    private static List<GameObject> poolMap = new List<GameObject>();
-    private static List<GameObject> poolCheese = new List<GameObject>();
+    private List<GameObject> poolMap = new List<GameObject>();
+    private List<GameObject> poolCheese = new List<GameObject>();
 
     private int[] probability = new int[3] {50, 30, 20};
 
@@ -42,6 +42,7 @@ public class MapManager : MonoBehaviour
     void Start()
     {
         MapInit();
+        GameManager.Instance.ScoreReset();
     }
 
     public void MapInit()

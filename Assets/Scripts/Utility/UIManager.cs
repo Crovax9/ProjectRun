@@ -11,6 +11,8 @@ public class UIManager : MonoBehaviour
     public UISprite cheeseSprite;
     public GameObject FeverLabel;
 
+    public TweenPosition tweenPosition;
+
     public List<GameObject> cheeseScoreBoard;
 
     private static UIManager _instance = null;
@@ -29,9 +31,11 @@ public class UIManager : MonoBehaviour
     void Awake()
     {
         _instance = this;
+        ScoreBoardReset();
         ScoreBoard();
     }
 
+    /*
     public void CheeseScoreBoard(int score)
     {
         var Board = cheeseScoreBoard.Where(board => board.activeInHierarchy == false).First();
@@ -40,12 +44,19 @@ public class UIManager : MonoBehaviour
         Board.GetComponent<TweenPosition>().enabled = true;
         StartCoroutine(BoardReset(Board));
     }
-
+    
     IEnumerator BoardReset(GameObject board)
     {
         yield return new WaitForSeconds(2.0f);
         board.SetActive(false);
         board.transform.localPosition = cheeseScoreBoardPosition;
+    }
+    */
+
+
+    private void ScoreBoardReset()
+    {
+        scoreBoard.text = "0";
     }
 
     private void ScoreBoard()

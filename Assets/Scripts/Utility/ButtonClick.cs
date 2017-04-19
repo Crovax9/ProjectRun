@@ -13,6 +13,11 @@ public class ButtonClick : MonoBehaviour
         GameManager.Instance.SceneMove("Main");
     }
 
+    public void MainButtonClick()
+    {
+        GameManager.Instance.SceneMove("StartScene");
+    }
+
     public void RankButtonClick()
     {
         rankTween.PlayReverse();
